@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_app/model/task_data.dart';
 
-class AddTaskScreen extends StatelessWidget {
-  const AddTaskScreen({super.key, required this.addTaskCallback});
+class AddTaskScreen extends StatefulWidget {
+  const AddTaskScreen({super.key});
 
-  final Function(String?) addTaskCallback;
+  @override
+  _AddTaskScreenState createState() => _AddTaskScreenState();
+}
+
+class _AddTaskScreenState extends State<AddTaskScreen> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    String? newTaskTitle;
-
     return Container(
       color: Color(0xFF757575),
       child: Container(
@@ -31,11 +43,9 @@ class AddTaskScreen extends StatelessWidget {
               ),
             ),
             TextField(
+              controller: _controller,
               autofocus: true,
               textAlign: TextAlign.center,
-              onChanged: (value) {
-                newTaskTitle = value;
-              },
             ),
             const SizedBox(
               height: 15,
@@ -52,7 +62,12 @@ class AddTaskScreen extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                addTaskCallback(newTaskTitle);
+                final String newTaskTitle = _controller.text;
+                if (newTaskTitle.isNotEmpty) {
+                  Provider.of<TaskData>(context, listen: false)
+                      .addTask(newTaskTitle);
+                  Navigator.pop(context);
+                }
               },
               child: const Text(
                 "Add",
